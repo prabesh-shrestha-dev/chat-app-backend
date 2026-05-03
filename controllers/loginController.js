@@ -37,7 +37,7 @@ const handleLogin = async (req, res) => {
           "UserInfo": { phoneNumber }
         },
         process.env.REFRESH_TOKEN_SECRET,
-        { expiresIn: '15s' }
+        { expiresIn: '25s' }
       );
       foundUser.refreshToken = refreshToken;
       await foundUser.save();
@@ -46,7 +46,7 @@ const handleLogin = async (req, res) => {
         httpOnly: true, 
         sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax', 
         secure: process.env.NODE_ENV === 'production', 
-        maxAge: 15 * 1000 
+        maxAge: 25 * 1000 
       });
       return res.json({ accessToken });
 
