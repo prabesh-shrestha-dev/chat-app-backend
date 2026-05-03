@@ -39,7 +39,7 @@ const handleNewUser = async (req, res) => {
     res.status(201).json({ message: `New user created: ${phoneNumber}`});
   } catch (err) {
     res.status(500).json({
-      message: err.message
+      message: `Server Error: ${err.message}`
     })
   }
 };
