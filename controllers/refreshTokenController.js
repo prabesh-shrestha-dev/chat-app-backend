@@ -3,7 +3,6 @@ const User = require('../model/User');
 
 const handleRefreshToken = async (req, res) => {
   const { refreshToken } = req.cookies;
-  console.log(refreshToken);
 
   if (!refreshToken) {
     return res.status(401).json({
