@@ -29,7 +29,7 @@ const handleLogin = async (req, res) => {
           "UserInfo": { phoneNumber, firstName, middleName, lastName }
         },
         process.env.ACCESS_TOKEN_SECRET,
-        { expiresIn: '10s' }
+        { expiresIn: '1h' }
       );
 
       const refreshToken = jwt.sign(
@@ -37,7 +37,7 @@ const handleLogin = async (req, res) => {
           "UserInfo": { phoneNumber }
         },
         process.env.REFRESH_TOKEN_SECRET,
-        { expiresIn: '25s' }
+        { expiresIn: '1d' }
       );
       foundUser.refreshToken = refreshToken;
       await foundUser.save();
@@ -46,9 +46,9 @@ const handleLogin = async (req, res) => {
         httpOnly: true, 
         sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax', 
         secure: process.env.NODE_ENV === 'production', 
-        maxAge: 25 * 1000 
+        maxAge: 1 * 24 * 60 * 60 * 1000 
       });
-      return res.json({ accessToken });
+      return res.json({ accessToken, phoneNumber, firstName, middleName, lastName });
 
     } else {
       return res.status(401).json({
