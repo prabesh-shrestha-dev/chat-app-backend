@@ -8,6 +8,10 @@ const handleNewUser = async (req, res) => {
     return res.status(400).json({
       message: 'Phone number is required.'
     });
+  } else if (!/^\d+$/.test(phoneNumber)) {
+    return res.status(400).json({
+      message: "Phone number must contain only digits."
+    });
   } else if (!password) {
     return res.status(400).json({
       message: 'Password is required.'

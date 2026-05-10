@@ -20,13 +20,12 @@ const verifyJWT = (req, res, next) => {
     (err, decoded) => {
       if (err) {
         return res.status(403).json({
-          'message': err.message
+          'message': err.message || "Invalid token."
         });
       }
-      req.phoneNumber = decoded.UserInfo.phoneNumber;
-      req.firstName = decoded.UserInfo.firstName;
-      req.middleName = decoded.UserInfo.middleName;
-      req.lastName = decoded.UserInfo.lastName;
+      req.user = {
+        id: decoded.UserInfo.id
+      }
       next();
     }
   )

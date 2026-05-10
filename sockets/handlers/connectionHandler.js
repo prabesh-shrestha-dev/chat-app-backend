@@ -1,7 +1,8 @@
 const registerConnection = (io) => {
   io.on("connection", (socket) => {
-    console.log("User connnected: ", socket.UserInfo);
+    console.log("User connnected: ", socket.UserInfo, socket.id);
 
+    // AccessToken validity test before every socketEvent
     socket.use((packet, next) => {
       const now = Math.floor(Date.now() / 1000);
 
@@ -14,8 +15,15 @@ const registerConnection = (io) => {
       next();
     });
 
+    // Join to the room with own's userId
+    socket.join(socket.UserInfo.id);
+
+    socket.on("join-room", (roomId) => {
+      socket.join(roomId);
+    })
+
     socket.on("disconnect", () => {
-      console.log("User disconnected: ", socket.id);
+      console.log("User disconnected: ", socket.UserInfo, socket.id);
     });
   });
 };

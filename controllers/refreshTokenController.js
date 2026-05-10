@@ -16,25 +16,26 @@ const handleRefreshToken = async (req, res) => {
       'message': 'RefreshToken not available.'
     });
   }
+  
+  const userId = foundUser._id.toString();
 
   jwt.verify(
     refreshToken,
     process.env.REFRESH_TOKEN_SECRET,
     (err, decoded) => {
-      if (err || foundUser.phoneNumber !== decoded.UserInfo.phoneNumber ) {
+      if (err || userId !== decoded.UserInfo.id ) {
         return res.status(403).json({
           'message': err?.message || 'Invalid UserInfo.'
         });
       }
-      const { firstName, middleName, lastName } = foundUser;
       const accessToken = jwt.sign(
         {
-          "UserInfo": { phoneNumber: decoded.UserInfo.phoneNumber, firstName, middleName, lastName }
+          "UserInfo": { id: userId }
         },
         process.env.ACCESS_TOKEN_SECRET,
-        { expiresIn: '1h' }
+        { expiresIn: '15m' }
       );
-      return res.json({ accessToken });
+      return res.json({ accessToken, userId });
     }
   )
 };

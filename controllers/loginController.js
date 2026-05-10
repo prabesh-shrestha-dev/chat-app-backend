@@ -9,6 +9,10 @@ const handleLogin = async (req, res) => {
     return res.status(400).json({
       message: 'Phone number or password is required.'
     });
+  } else if (!/^\d+$/.test(phoneNumber)) {
+    return res.status(400).json({
+      message: "Phone number must contain only digits."
+    });
   }
 
   try {
@@ -22,19 +26,19 @@ const handleLogin = async (req, res) => {
     const match = await bcrypt.compare(password, foundUser.password);
 
     if (match) {
-      const { firstName, middleName, lastName } = foundUser;
+      const userId = foundUser._id.toString();
 
       const accessToken = jwt.sign(
         {
-          "UserInfo": { phoneNumber, firstName, middleName, lastName }
+          "UserInfo": { id: userId }
         },
         process.env.ACCESS_TOKEN_SECRET,
-        { expiresIn: '1h' }
+        { expiresIn: '15m' }
       );
 
       const refreshToken = jwt.sign(
         {
-          "UserInfo": { phoneNumber }
+          "UserInfo": { id: userId }
         },
         process.env.REFRESH_TOKEN_SECRET,
         { expiresIn: '1d' }
@@ -48,7 +52,7 @@ const handleLogin = async (req, res) => {
         secure: process.env.NODE_ENV === 'production', 
         maxAge: 1 * 24 * 60 * 60 * 1000 
       });
-      return res.json({ accessToken, phoneNumber, firstName, middleName, lastName });
+      return res.json({ accessToken, userId });
 
     } else {
       return res.status(401).json({
