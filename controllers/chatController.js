@@ -75,7 +75,7 @@ const handleCreateChat = async (req, res) => {
       .exec();
 
     const io = req.app.get("io");
-    io.to(userId).emit("chat-created", populatedChat);
+    io.to(userId).to(foundUserId).emit("chat-created", populatedChat);
 
     return res.status(201).json({
       message: `Successful chat creation with ${foundUser._id} by ${userId}`

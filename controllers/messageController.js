@@ -1,3 +1,4 @@
+const Chat = require("../model/Chat");
 const Message = require("../model/Message");
 
 const getMessages = async (req, res) => {
@@ -42,10 +43,25 @@ const handleNewMessage = async (req, res) => {
       });
     }
 
+    const foundChat = await Chat.findOne({ _id: chatId }).exec();
+    if (!foundChat) {
+      return res.status(404).json({
+        messages: 'Chat not found'
+      });
+    }
+
     const newMessage = await Message.create({ chat: chatId, sender: userId, content: message });
+
+    foundChat.latestMessage = newMessage._id;
+    foundChat.latestMessageAt = new Date();
+    await foundChat.save();
 
     const io = res.app.get("io");
     io.to(chatId).emit("receive-message", newMessage, chatId);
+    
+    const latestMessage = await newMessage.populate('sender', 'firstName middleName lastName');
+    const otherUserId = foundChat.users.find(user => user.toString() !== userId).toString();
+    io.to(userId).to(otherUserId).emit("chat-updated", chatId, latestMessage);
 
     return res.json({ newMessage });
   } catch (err) {

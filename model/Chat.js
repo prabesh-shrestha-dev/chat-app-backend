@@ -19,6 +19,7 @@ const chatSchema = new Schema({
   latestMessageAt: {
     type: Date
   },
+  // group specification
   name: {
     type: String,
     trim: true

@@ -45,13 +45,6 @@ app.use('/logout', require('./routes/logout'));
 
 app.use(verifyJWT);
 
-const User = require('./model/User');
-app.get('/home', async (req, res) => {
-
-  const foundUser = await User.findOne({ _id: req.user.id }).exec();
-  res.json({ phoneNumber: foundUser.phoneNumber, firstName: foundUser.firstName });
-});
-
 app.use('/chats', require('./routes/chats'));
 app.use('/message', require('./routes/message'));
 
