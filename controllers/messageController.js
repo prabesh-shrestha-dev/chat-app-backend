@@ -37,7 +37,7 @@ const handleNewMessage = async (req, res) => {
       })
     }
 
-    if (!message) {
+    if (!message.trim()) {
       return res.status(400).json({
         message: 'Message required'
       });
