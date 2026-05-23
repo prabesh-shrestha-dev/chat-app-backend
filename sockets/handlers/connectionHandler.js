@@ -1,3 +1,5 @@
+const Message = require("../../model/Message");
+
 const registerConnection = (io) => {
   io.on("connection", (socket) => {
     console.log("User connnected: ", socket.UserInfo, socket.id);
@@ -26,7 +28,32 @@ const registerConnection = (io) => {
     socket.on("leave-room", (roomId) => {
       console.log('Room left');
       socket.leave(roomId);
-    })
+    });
+
+    socket.on("typing", (roomId) => {
+      socket.to(roomId).emit("receive-typing");
+    });
+
+    socket.on("not-typing", (roomId) => {
+      socket.to(roomId).emit("receive-not-typing");
+    });
+
+    socket.on("seen", async (chatId, userId) => {
+
+      const foundMessage = await Message
+        .findOne({ chat: chatId })
+        .sort({ createdAt: -1 })
+        .exec();
+      
+      if (!foundMessage) return;
+
+      if (userId === foundMessage.sender.toString()) return;
+
+      foundMessage.readBy.push(userId);
+      await foundMessage.save();
+
+      socket.to(chatId).emit("seen-message", foundMessage?._id);
+    });
 
     socket.on("disconnect", () => {
       console.log("User disconnected: ", socket.UserInfo, socket.id);
